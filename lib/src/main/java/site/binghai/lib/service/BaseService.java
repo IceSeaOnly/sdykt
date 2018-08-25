@@ -127,8 +127,8 @@ public abstract class BaseService<T extends BaseEntity> extends BaseBean {
     }
 
     @Transactional
-    public void batchSave(List<T> batch) {
-        getDao().saveAll(batch);
+    public List<T> batchSave(List<T> batch) {
+        return getDao().saveAll(batch);
     }
 
     /**
