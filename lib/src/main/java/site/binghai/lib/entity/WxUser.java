@@ -13,14 +13,13 @@ public class WxUser extends BaseEntity implements SessionPersistent {
     @Id
     @GeneratedValue
     private Long id;
+    private Long bindTokenId;
+    private String tokenNo;
+    private String password;
     private String avatar;
     private String userName;
     private String phone;
     private String openId;
     private Long refereeId; //推荐人id
 
-    @Override
-    public String sessionTag() {
-        return "_WX_USER_";
-    }
 }

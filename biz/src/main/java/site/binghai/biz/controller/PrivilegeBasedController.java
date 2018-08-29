@@ -8,7 +8,7 @@ public abstract class PrivilegeBasedController extends BaseController {
 
     protected boolean hasPrivilege() {
         Token token = getSessionPersistent(Token.class);
-        return token.getPrivilegeList().contains(privilegeRequired().name());
+        return token != null && token.getPrivilegeList().contains(privilegeRequired().name());
     }
 
     abstract PrivilegeEnum privilegeRequired();
