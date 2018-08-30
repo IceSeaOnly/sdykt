@@ -29,7 +29,7 @@ public class ExaminationSchoolRecord extends BaseEntity {
     private Double rate;
     // 投出数
     private Double throwNum;
-    // 最低分
+    // 最高分
     private Double maxScore;
     // 最低分
     private Double minScore;
