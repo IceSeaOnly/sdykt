@@ -2,6 +2,7 @@ package site.binghai.lib.utils;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -34,13 +35,21 @@ public abstract class BaseBean extends MapUtils {
         return JSONObject.parseObject(JSONObject.toJSONString(obj));
     }
 
-    protected JSONArray toJSONArray(Collection data) {
-        JSONArray array = newJSONArray();
-        data.forEach(v -> array.add(toJsonObject(v)));
-        return array;
+    protected boolean isEmptyList(List list) {
+        return CollectionUtils.isEmpty(list);
     }
 
-    protected boolean noEmptyString(Collection<String> strs) {
+    public <T> T safeGet(List<T> list, int index) {
+        if (isEmptyList(list)) return null;
+        if (list.size() < index) return null;
+        return list.get(index);
+    }
+
+    public long now() {
+        return TimeTools.currentTS();
+    }
+
+    protected boolean hasEmptyString(Collection<String> strs) {
         for (String str : strs) {
             if (StringUtils.isEmpty(str))
                 return false;
@@ -48,12 +57,13 @@ public abstract class BaseBean extends MapUtils {
         return true;
     }
 
-    protected boolean noEmptyString(String... strs) {
-        for (String str : strs) {
-            if (StringUtils.isEmpty(str))
-                return false;
+    protected boolean hasEmptyString(Object... strs) {
+        for (Object str : strs) {
+            if (str == null) return true;
+            if (StringUtils.isEmpty(str.toString()))
+                return true;
         }
-        return true;
+        return false;
     }
 
 }

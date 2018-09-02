@@ -74,17 +74,17 @@ public class TimeTools {
 
     public static int getThisYear(Long null_ts) {
         SimpleDateFormat df = new SimpleDateFormat("yyyy");
-        return Integer.parseInt(df.format(null_ts == null ? System.currentTimeMillis() : null_ts));
+        return Integer.parseInt(df.format(null_ts == null ? currentTS() : null_ts));
     }
 
     public static int getThisMonth(Long null_ts) {
         SimpleDateFormat df = new SimpleDateFormat("MM");
-        return Integer.parseInt(df.format(null_ts == null ? System.currentTimeMillis() : null_ts));
+        return Integer.parseInt(df.format(null_ts == null ? currentTS() : null_ts));
     }
 
     public static int getThisDay(Long null_ts) {
         SimpleDateFormat df = new SimpleDateFormat("dd");
-        return Integer.parseInt(df.format(null_ts == null ? System.currentTimeMillis() : null_ts));
+        return Integer.parseInt(df.format(null_ts == null ? currentTS() : null_ts));
     }
 
 

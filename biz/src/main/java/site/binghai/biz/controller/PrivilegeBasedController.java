@@ -11,5 +11,9 @@ public abstract class PrivilegeBasedController extends BaseController {
         return token != null && token.getPrivilegeList().contains(privilegeRequired().name());
     }
 
+    public Object permissionDeny() {
+        return fail("permission deny.");
+    }
+
     abstract PrivilegeEnum privilegeRequired();
 }

@@ -48,6 +48,6 @@ public class MD5 {
      * 生成随机的短密码
      */
     public static String sortPass() {
-        return MD5.encryption(System.currentTimeMillis() + "").substring(17);
+        return MD5.encryption(TimeTools.currentTS() + "").substring(17);
     }
 }

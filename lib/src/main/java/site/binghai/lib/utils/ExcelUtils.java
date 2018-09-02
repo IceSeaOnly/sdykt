@@ -226,13 +226,13 @@ public class ExcelUtils {
                 cellValue = cell.getCellFormula() + "";
                 break;
             case Cell.CELL_TYPE_BLANK: // 空值
-                cellValue = "";
+                cellValue = null;
                 break;
             case Cell.CELL_TYPE_ERROR: // 故障
-                cellValue = "非法字符";
+                cellValue = null;
                 break;
             default:
-                cellValue = "未知类型";
+                cellValue = null;
                 break;
         }
         return cellValue;

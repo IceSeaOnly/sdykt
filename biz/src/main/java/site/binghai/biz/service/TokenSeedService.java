@@ -35,7 +35,7 @@ public class TokenSeedService extends BaseService<TokenSeed> {
     @Transactional
     public TokenSeed init() {
         TokenSeed root = new TokenSeed();
-        root.setCurrent(System.currentTimeMillis());
+        root.setCurrent(now());
         return save(root);
     }
 }
