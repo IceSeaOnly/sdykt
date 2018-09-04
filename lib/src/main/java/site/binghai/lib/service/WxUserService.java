@@ -19,4 +19,10 @@ public class WxUserService extends BaseService<WxUser> {
         user.setPhone(phone);
         return queryOne(user);
     }
+
+    public WxUser findByTokenNo(String token_no) {
+        WxUser user = new WxUser();
+        user.setTokenNo(token_no);
+        return queryOne(user);
+    }
 }

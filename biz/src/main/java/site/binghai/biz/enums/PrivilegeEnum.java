@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public enum PrivilegeEnum {
-    ArtRegister4Examination("艺术志愿报考"),
+    ArtRegister4Examination("志愿填报"),
 
     ;
 

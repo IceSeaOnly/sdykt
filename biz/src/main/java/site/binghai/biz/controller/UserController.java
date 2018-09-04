@@ -2,6 +2,7 @@ package site.binghai.biz.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import site.binghai.biz.entity.Token;
 import site.binghai.biz.service.SmsTokenService;
 import site.binghai.biz.service.TokenService;
 import site.binghai.lib.controller.BaseController;
@@ -28,23 +29,39 @@ public class UserController extends BaseController {
 
     @PostMapping("login")
     public Object login(@RequestBody Map map) {
-        String phone = getString(map, "PHONE");
-        String passwd = getString(map, "PASS_WD");
+        String TOKEN_NO = getString(map, "TOKEN_NO");
+        String TOKEN_SECRET = getString(map, "TOKEN_SECRET");
 
-        if (hasEmptyString(phone, passwd)) {
+        if (hasEmptyString(TOKEN_NO, TOKEN_SECRET)) {
             fail("输入不正确!");
         }
 
-        WxUser user = wxUserService.login(phone, passwd);
-        if (user == null) {
+        Token token = tokenService.findByTokenAndSecret(TOKEN_NO,TOKEN_SECRET);
+        if (token == null) {
             return fail("卡号/密码错误!");
         }
 
-        if (user.getBindTokenId() != null) {
-            persistent(tokenService.findById(user.getBindTokenId()));
+
+        WxUser user = wxUserService.findByTokenNo(TOKEN_NO);
+        if (user == null) {
+            user = new WxUser();
+            user.setTokenNo(TOKEN_NO);
+            user.setUserName("新用户");
+            user.setPhone("还没有手机号~");
+            user.setPassword(TOKEN_SECRET);
+            user.setAvatar("http://cdn.binghai.site/o_1cmc3drecfph1nt48dv194k1p6ta.jpg");
+            user.setBindTokenId(token.getId());
+            user.setEmail("还没有电邮~");
+            user.setMyDeclaration("这个人很懒，什么都还没有写~");
+            user = wxUserService.save(user);
+
+            token.setBindUserId(user.getId());
+            token.setActiveTime(now());
+            tokenService.update(token);
         }
 
         persistent(user);
+        persistent(token);
         return success();
     }
 

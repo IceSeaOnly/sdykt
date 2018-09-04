@@ -1,6 +1,11 @@
-package site.binghai.lib.utils;
+package site.binghai.biz.utils;
 
+import org.apache.commons.lang3.StringUtils;
+import site.binghai.biz.entity.Token;
+import site.binghai.biz.enums.PrivilegeEnum;
 import site.binghai.lib.entity.WxUser;
+
+import java.util.Arrays;
 
 public class MockUtils {
     public static WxUser mockUser() {
@@ -11,5 +16,11 @@ public class MockUtils {
         user.setUserName("TEST_MOCK");
         user.setId(999999999L);
         return user;
+    }
+
+    public static Token mockToken() {
+        Token token = new Token();
+        token.setPrivileges(StringUtils.join(PrivilegeEnum.values(), ","));
+        return token;
     }
 }

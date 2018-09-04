@@ -3,7 +3,7 @@ package site.binghai;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
-import site.binghai.lib.config.IceConfig;
+import site.binghai.biz.config.IceConfig;
 
 @ComponentScan(value = {"site.binghai.lib", "site.binghai.biz"})
 @SpringBootApplication

@@ -35,7 +35,17 @@ public abstract class BaseBean extends MapUtils {
         return JSONObject.parseObject(JSONObject.toJSONString(obj));
     }
 
-    protected boolean isEmptyList(List list) {
+    protected JSONArray toJSONArray(Collection collection) {
+        JSONArray array = newJSONArray();
+        if (!isEmptyList(collection)) {
+            collection.forEach(v -> {
+                array.add(toJsonObject(v));
+            });
+        }
+        return array;
+    }
+
+    protected boolean isEmptyList(Collection list) {
         return CollectionUtils.isEmpty(list);
     }
 
@@ -60,7 +70,7 @@ public abstract class BaseBean extends MapUtils {
     protected boolean hasEmptyString(Object... strs) {
         for (Object str : strs) {
             if (str == null) return true;
-            if (StringUtils.isEmpty(str.toString()))
+            if (StringUtils.isBlank(str.toString()))
                 return true;
         }
         return false;

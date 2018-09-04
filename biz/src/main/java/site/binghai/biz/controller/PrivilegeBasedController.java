@@ -12,7 +12,7 @@ public abstract class PrivilegeBasedController extends BaseController {
     }
 
     public Object permissionDeny() {
-        return fail("permission deny.");
+        return fail("权限未开通");
     }
 
     abstract PrivilegeEnum privilegeRequired();

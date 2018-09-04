@@ -103,7 +103,7 @@ public class TokenManageController extends BaseController {
         int size = getIntValue(map, "TOKEN_SIZE");
 
 
-        if (!noEmptyString(privileges)) {
+        if (hasEmptyString(privileges)) {
             return fail("PRIVILEGES NOT EXIST");
         }
 
@@ -113,7 +113,7 @@ public class TokenManageController extends BaseController {
                 .collect(Collectors.joining(","));
 
 
-        if (!noEmptyString(privileges)) {
+        if (hasEmptyString(privileges)) {
             return fail("PRIVILEGES NOT EXIST");
         }
 
