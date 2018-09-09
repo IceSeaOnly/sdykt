@@ -15,7 +15,7 @@ import java.util.List;
 public class SmsTokenService extends BaseService<SmsToken> {
 
     @Autowired
-    private SmsService aliyunSmsService;
+    private SmsService miaoDiSmsService;
 
     @Transactional
     public boolean varify(String phone, String input) {
@@ -33,7 +33,7 @@ public class SmsTokenService extends BaseService<SmsToken> {
     public void sendVerifyCode(String phone) throws Exception {
         String code = (""+now()).substring(7);
         if (checkPhoneNumber(phone) && clearHistory(phone)) {
-            String resp = aliyunSmsService.sendVerifyCodeSms(phone, code);
+            String resp = miaoDiSmsService.sendVerifyCodeSms(phone, code);
 
             SmsToken smsToken = new SmsToken();
             smsToken.setPhone(phone);
