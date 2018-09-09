@@ -51,9 +51,6 @@ public class TokenManageController extends BaseController {
         JSONObject obj = new JSONObject();
         page = page < 0 ? 0 : page;
         List<Token> tokens = tokenService.findAll(page, 100);
-        if (!isEmptyList(tokens)) {
-            tokens.sort((a, b) -> a.getBindUserId() != null ? 1 : -1);
-        }
         obj.put("list", tokens);
         obj.put("total", tokenService.count());
         obj.put("page", page);
