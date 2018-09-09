@@ -47,7 +47,7 @@ public class UserController extends BaseController {
             user = new WxUser();
             user.setTokenNo(TOKEN_NO);
             user.setUserName("新用户");
-            user.setPhone("还没有手机号~");
+            user.setPhone(null);
             user.setPassword(TOKEN_SECRET);
             user.setAvatar("http://cdn.binghai.site/o_1cmc3drecfph1nt48dv194k1p6ta.jpg");
             user.setBindTokenId(token.getId());
