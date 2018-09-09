@@ -23,6 +23,7 @@ public class WxUser extends BaseEntity implements SessionPersistent {
     private String email;
     private String myDeclaration;
     private String openId;
+    private String region; // 所在区域
     private Long refereeId; //推荐人id
 
 }

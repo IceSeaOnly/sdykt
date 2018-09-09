@@ -7,16 +7,22 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import site.binghai.biz.service.SmsTokenService;
 import site.binghai.lib.controller.BaseController;
+import site.binghai.lib.entity.WxUser;
 
 @RestController
-@RequestMapping("/api/")
+@RequestMapping("/user/api/")
 public class Api extends BaseController {
     @Autowired
     private SmsTokenService smsTokenService;
 
     @GetMapping("applySmsValid")
     public Object applySmsValid(@RequestParam String phone) {
-        if (checkLastSendTime()) {
+        WxUser user = getSessionPersistent(WxUser.class);
+        if(!hasEmptyString(user.getPhone())){
+            return fail("您已经绑定手机号，无需重复绑定");
+        }
+
+        if (!checkLastSendTime()) {
             return fail("请求过于频繁!");
         }
 

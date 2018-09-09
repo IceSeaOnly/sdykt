@@ -2,18 +2,21 @@ package site.binghai.biz.service;
 
 import org.springframework.stereotype.Service;
 import site.binghai.biz.entity.SmsToken;
+import site.binghai.biz.utils.TokenGenerator;
 import site.binghai.lib.service.BaseService;
 import site.binghai.lib.utils.TimeTools;
 
+import javax.transaction.Transactional;
 import java.util.List;
 
 @Service
 public class SmsTokenService extends BaseService<SmsToken> {
 
+    @Transactional
     public boolean varify(String phone, String input) {
         SmsToken smsToken = findLastestValidByPhone(phone);
         if (!isValid(smsToken)) return false;
-        if (smsToken.getCreated().equals(input)) {
+        if (smsToken.getCode().equals(input)) {
             smsToken.setValid(false);
             update(smsToken);
             return true;
@@ -21,8 +24,9 @@ public class SmsTokenService extends BaseService<SmsToken> {
         return false;
     }
 
+    @Transactional
     public void sendVerifyCode(String phone) throws Exception {
-        String code = TimeTools.now().substring(7);
+        String code = (""+now()).substring(7);
         if (checkPhoneNumber(phone) && clearHistory(phone)) {
             String resp = sendVerifyCode(phone, code);
 
@@ -31,7 +35,8 @@ public class SmsTokenService extends BaseService<SmsToken> {
             smsToken.setCode(code);
             smsToken.setValid(true);
             smsToken.setResponse(resp);
-            save(smsToken);
+            smsToken = save(smsToken);
+            logger.info("sms verify sended:{}",smsToken);
         }
     }
 
@@ -58,7 +63,7 @@ public class SmsTokenService extends BaseService<SmsToken> {
     }
 
     private String sendVerifyCode(String phone, String code) throws Exception {
-        return "";
+        return "SUCCESS";
     }
 
     public boolean checkPhoneNumber(String phone) {
@@ -77,6 +82,7 @@ public class SmsTokenService extends BaseService<SmsToken> {
         return true;
     }
 
+    @Transactional
     public boolean isValid(SmsToken smsToken) {
         if (smsToken == null) return false;
         if (!smsToken.isValid()) return false;

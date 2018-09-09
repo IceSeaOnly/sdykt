@@ -8,8 +8,10 @@ import site.binghai.biz.entity.ExaminationSchoolRecord;
 import site.binghai.biz.entity.SelectId;
 import site.binghai.biz.enums.PrivilegeEnum;
 import site.binghai.biz.service.ExaminationSchoolRecordService;
+import site.binghai.lib.utils.GroovyEngineUtils;
 import site.binghai.lib.utils.HttpUtils;
 
+import javax.script.ScriptException;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -18,8 +20,7 @@ import java.util.stream.Collectors;
 @RequestMapping("/user/artRegister4Examination/")
 public class ArtRegister4ExaminationController extends PrivilegeBasedController {
     private Object cityCache;
-    private JSONObject swScoreConsultCache;
-    private Integer tolerance;
+    private GroovyEngineUtils.GroovyEngine swEngine;
 
     @Autowired
     private ExaminationSchoolRecordService examinationSchoolRecordService;
@@ -53,19 +54,13 @@ public class ArtRegister4ExaminationController extends PrivilegeBasedController 
         return success(ls, null);
     }
 
-    @GetMapping("consultSwScore")
-    public Object consultSwScore(@RequestParam Long score, @RequestParam String year) {
+    @PostMapping("consultSwScore")
+    public Object consultSwScore(@RequestBody Map map) throws Exception {
         if (!hasPrivilege()) {
             return permissionDeny();
         }
-
-        if (score == null || score <= 0 || hasEmptyString(year)) {
-            return fail("无法三维标准分");
-        }
-        JSONObject map = getYearConsultCache(year);
-        if (map == null) return fail("无法三维标准分");
-
-        score += map.getLong("sw");
+        Map result = calculateSwScore(map);
+        Integer score = getInteger(result, "sw");
         return success(score, null);
     }
 
@@ -77,7 +72,7 @@ public class ArtRegister4ExaminationController extends PrivilegeBasedController 
         String score = getString(map, "score");
         String year = getString(map, "year");
         String city = getString(map, "city");
-        String sw_score = getString(map, "sw_score");
+        Integer sw_score = getInteger(map, "sw_score");
 
         if (hasEmptyString(batchName, batchType, score, year)) {
             return fail("年份、批次、科类、分数都是必填的哦~");
@@ -87,9 +82,10 @@ public class ArtRegister4ExaminationController extends PrivilegeBasedController 
                 examinationSchoolRecordService.findByBatchNameAndBatchTypeAndYear(batchName, batchType, year);
 
         List rs = recordList.stream()
-                .filter(v -> inRound(score, v))
+                .filter(v -> !hasEmptyString(v.getMinScore()))
+                .filter(v -> sw_score > v.getMinScore())
                 .sorted((a, b) -> b.getMinScore() > a.getMinScore() ? 1 : -1)
-                .limit(100)
+                .limit(16)
                 .collect(Collectors.toList());
 
         JSONObject ret = newJSONObject();
@@ -99,24 +95,18 @@ public class ArtRegister4ExaminationController extends PrivilegeBasedController 
         return success(ret, null);
     }
 
-    private boolean inRound(String score, ExaminationSchoolRecord v) {
-        if (hasEmptyString(v.getMinScore())) return false;
-        Integer value = Integer.valueOf(score);
-        JSONObject data = getYearConsultCache(v.getYear() + "");
-        if (value > v.getMinScore() - data.getInteger("tl")) return true;
-        return false;
-    }
 
-    private JSONObject getYearConsultCache(String year) {
-        if (swScoreConsultCache == null) {
-            swScoreConsultCache = HttpUtils.sendJSONGet("https://wx.nanayun.cn/api", "act=9f0ee8e30fe88ee");
+    private Map calculateSwScore(Map context) throws Exception {
+        if (swEngine == null) {
+            String script = HttpUtils.sendGet("https://wx.nanayun.cn/api", "act=20a47cba663cc7e");
+            swEngine = GroovyEngineUtils.instanceGroovyEngine(script);
         }
-        return swScoreConsultCache.getJSONObject(year);
+        return swEngine.invoke(context);
     }
 
 
     @GetMapping("options")
-    public Object options() {
+    public Object options(@RequestParam Integer type) {
         if (!hasPrivilege()) {
             return permissionDeny();
         }
@@ -124,8 +114,30 @@ public class ArtRegister4ExaminationController extends PrivilegeBasedController 
         JSONObject data = newJSONObject();
         data.put("yearList", examinationSchoolRecordService.distinctList("year"));
         data.put("cityList", getCityList());
-        data.put("batchNameList", examinationSchoolRecordService.distinctList("batchName"));
-        data.put("batchTypeList", examinationSchoolRecordService.distinctList("batchType"));
+
+        if (type == 0) {
+            List<String> batchNameList = emptyList();
+            batchNameList.add("本科");
+            batchNameList.add("专科");
+            data.put("batchNameList", batchNameList);
+
+            List<String> batchTypeList = emptyList();
+            batchTypeList.add("文科");
+            batchTypeList.add("理科");
+            data.put("batchTypeList", batchTypeList);
+        } else {
+            List<String> batchNameList = emptyList();
+            batchNameList.add("美术统考提前批");
+            batchNameList.add("美术统考一批");
+            batchNameList.add("文学编导提前批");
+            batchNameList.add("文学编导一批");
+            data.put("batchNameList", batchNameList);
+
+            List<String> batchTypeList = emptyList();
+            batchTypeList.add("艺术文");
+            batchTypeList.add("艺术理");
+            data.put("batchTypeList", batchTypeList);
+        }
         return success(data, null);
     }
 
