@@ -1,8 +1,10 @@
 package site.binghai.biz.service;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import site.binghai.biz.entity.SmsToken;
 import site.binghai.biz.utils.TokenGenerator;
+import site.binghai.lib.def.SmsService;
 import site.binghai.lib.service.BaseService;
 import site.binghai.lib.utils.TimeTools;
 
@@ -11,6 +13,9 @@ import java.util.List;
 
 @Service
 public class SmsTokenService extends BaseService<SmsToken> {
+
+    @Autowired
+    private SmsService aliyunSmsService;
 
     @Transactional
     public boolean varify(String phone, String input) {
@@ -28,7 +33,7 @@ public class SmsTokenService extends BaseService<SmsToken> {
     public void sendVerifyCode(String phone) throws Exception {
         String code = (""+now()).substring(7);
         if (checkPhoneNumber(phone) && clearHistory(phone)) {
-            String resp = sendVerifyCode(phone, code);
+            String resp = aliyunSmsService.sendVerifyCodeSms(phone, code);
 
             SmsToken smsToken = new SmsToken();
             smsToken.setPhone(phone);
@@ -60,10 +65,6 @@ public class SmsTokenService extends BaseService<SmsToken> {
             update(l);
         }
         return true;
-    }
-
-    private String sendVerifyCode(String phone, String code) throws Exception {
-        return "SUCCESS";
     }
 
     public boolean checkPhoneNumber(String phone) {

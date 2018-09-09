@@ -10,10 +10,7 @@ import site.binghai.lib.def.SmsService;
 
 @ComponentScan(value = {"site.binghai.lib", "site.binghai.biz"})
 @SpringBootApplication
-public class App implements CommandLineRunner {
-
-    @Autowired
-    private SmsService aliyunSmsService;
+public class App{
 
     public static void main(String[] args) {
         SpringApplication.run(App.class, args);
@@ -25,10 +22,5 @@ public class App implements CommandLineRunner {
                 IceConfig.addSetupParam(kv[0], kv[1]);
             }
         }
-    }
-
-    @Override
-    public void run(String... args) throws Exception {
-        aliyunSmsService.sendVerifyCodeSms("17854258196","666888");
     }
 }
