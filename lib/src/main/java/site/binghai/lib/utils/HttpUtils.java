@@ -69,7 +69,7 @@ public class HttpUtils {
      * @param param 请求参数，请求参数应该是 name1=value1&name2=value2 的形式。
      * @return 所代表远程资源的响应结果
      */
-    public static String sendPost(String url, String param, String body) {
+    public static String sendPost(String url, String param, String body,String contentType) {
         PrintWriter out = null;
         BufferedReader in = null;
         String result = "";
@@ -80,7 +80,7 @@ public class HttpUtils {
             conn.setReadTimeout(1000);
             // 设置通用的请求属性
             conn.setRequestProperty("accept", "*/*");
-            conn.setRequestProperty("Content-Type", "application/json;");
+            conn.setRequestProperty("Content-Type", contentType);
             conn.setRequestProperty("Accept-Language", "Keep-Alive");
             conn.setRequestProperty("connection", "Keep-Alive");
             conn.setRequestProperty("User-Agent",
@@ -121,13 +121,15 @@ public class HttpUtils {
         return result;
     }
 
+
+
     public static JSONObject sendJSONGet(String url, String param) {
         String res = sendGet(url, param);
         return JSONObject.parseObject(res);
     }
 
     public static JSONObject sendJSONPost(String url, String param, String body) {
-        String res = sendPost(url, param, body);
+        String res = sendPost(url, param, body,"application/json;");
         return JSONObject.parseObject(res);
     }
 }

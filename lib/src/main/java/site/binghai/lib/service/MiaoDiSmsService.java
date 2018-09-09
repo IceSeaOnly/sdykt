@@ -36,9 +36,9 @@ public class MiaoDiSmsService extends BaseBean implements SmsService {
 
         // 提交请求
         logger.info("sms verify url:{},body:{}", url, body);
-        JSONObject result = HttpUtils.sendJSONPost(url, null, body);
+        String result = HttpUtils.sendPost(url, null, body,"application/x-www-form-urlencoded");
         logger.info("send sms verify code to {},code :{},response:{}", to, code, result);
-        return result.toJSONString();
+        return result;
     }
 
     public String createCommonParam() {

@@ -19,7 +19,7 @@ public class UserController extends BaseController {
     @Autowired
     private TokenService tokenService;
     @Autowired
-    private SmsTokenService smsTokenService;
+    private SmsTokenService miaoDiSmsService;
 
     @RequestMapping("logout")
     public Object logout(){
@@ -84,7 +84,7 @@ public class UserController extends BaseController {
             return fail("手机号已被注册!");
         }
 
-        if (!smsTokenService.varify(phone, phoneVerifyCode)) {
+        if (!miaoDiSmsService.varify(phone, phoneVerifyCode)) {
             return fail("验证码错误!");
         }
 
