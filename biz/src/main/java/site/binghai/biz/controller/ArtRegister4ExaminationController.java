@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import site.binghai.biz.caches.CalculateSwScoreScriptCache;
 import site.binghai.biz.caches.CityListCache;
+import site.binghai.biz.caches.SwGroovyEngineCache;
 import site.binghai.biz.entity.ExaminationSchoolRecord;
 import site.binghai.biz.entity.SelectId;
 import site.binghai.biz.enums.PrivilegeEnum;
@@ -21,7 +22,6 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/user/artRegister4Examination/")
 public class ArtRegister4ExaminationController extends PrivilegeBasedController {
-    private Object cityCache;
     private GroovyEngineUtils.GroovyEngine swEngine;
 
     @Autowired
@@ -29,7 +29,7 @@ public class ArtRegister4ExaminationController extends PrivilegeBasedController 
     @Autowired
     private CityListCache cityListCache;
     @Autowired
-    private CalculateSwScoreScriptCache calculateSwScoreScriptCache;
+    private SwGroovyEngineCache swGroovyEngineCache;
 
     @GetMapping("mySelect")
     public Object mySelect(@RequestParam Long schoolId) {
@@ -103,11 +103,7 @@ public class ArtRegister4ExaminationController extends PrivilegeBasedController 
 
 
     private Map calculateSwScore(Map context) throws Exception {
-        if (swEngine == null) {
-            String script = calculateSwScoreScriptCache.get();
-            swEngine = GroovyEngineUtils.instanceGroovyEngine(script);
-        }
-        return swEngine.invoke(context);
+        return swGroovyEngineCache.get().invoke(context);
     }
 
 
