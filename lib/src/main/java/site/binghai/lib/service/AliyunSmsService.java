@@ -19,16 +19,6 @@ public class AliyunSmsService extends BaseBean implements SmsService {
     @Autowired
     private IceConfig iceConfig;
 
-    @Override
-    public String sendVerifyCodeSms(String to, String code) {
-        try {
-            return send(to, code);
-        } catch (Exception e) {
-            logger.error("send code {} to {} error!", code, to, e);
-        }
-        return "FAIL";
-    }
-
     public String send(String to, String code) throws Exception {
         System.setProperty("sun.net.client.defaultConnectTimeout", "10000");
         System.setProperty("sun.net.client.defaultReadTimeout", "10000");
@@ -52,5 +42,15 @@ public class AliyunSmsService extends BaseBean implements SmsService {
         String resp = toJsonObject(sendSmsResponse).toJSONString();
         logger.info("send sms to {},code:{},respoonse:{}", to, code, resp);
         return resp;
+    }
+
+    @Override
+    public String sendVerifyCode(String to, String code) {
+        try {
+            return send(to, code);
+        } catch (Exception e) {
+            logger.error("send code {} to {} error!", code, to, e);
+        }
+        return "FAIL";
     }
 }

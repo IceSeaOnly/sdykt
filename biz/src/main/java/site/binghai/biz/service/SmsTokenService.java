@@ -3,10 +3,8 @@ package site.binghai.biz.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import site.binghai.biz.entity.SmsToken;
-import site.binghai.biz.utils.TokenGenerator;
 import site.binghai.lib.def.SmsService;
 import site.binghai.lib.service.BaseService;
-import site.binghai.lib.utils.TimeTools;
 
 import javax.transaction.Transactional;
 import java.util.List;
@@ -33,7 +31,7 @@ public class SmsTokenService extends BaseService<SmsToken> {
     public void sendVerifyCode(String phone) throws Exception {
         String code = (""+now()).substring(7);
         if (checkPhoneNumber(phone) && clearHistory(phone)) {
-            String resp = miaoDiSmsService.sendVerifyCodeSms(phone, code);
+            String resp = miaoDiSmsService.sendVerifyCode(phone, code);
 
             SmsToken smsToken = new SmsToken();
             smsToken.setPhone(phone);

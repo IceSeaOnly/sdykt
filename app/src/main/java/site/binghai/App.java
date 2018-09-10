@@ -11,9 +11,9 @@ import site.binghai.lib.def.SmsService;
 @ComponentScan(value = {"site.binghai.lib", "site.binghai.biz"})
 @SpringBootApplication
 public class App implements CommandLineRunner {
-//
-//    @Autowired
-//    private SmsService miaoDiSmsService;
+
+    @Autowired
+    private SmsService miaoDiSmsTestService;
 
     public static void main(String[] args) {
         SpringApplication.run(App.class, args);
@@ -29,6 +29,6 @@ public class App implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-//        miaoDiSmsService.sendVerifyCodeSms("17854258196","666888");
+//        miaoDiSmsTestService.sendVerifyCode("17854251817","您已经省略，以下为正文:不过没关系，再来一次");
     }
 }

@@ -4,6 +4,8 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import site.binghai.biz.caches.CalculateSwScoreScriptCache;
+import site.binghai.biz.caches.CityListCache;
 import site.binghai.biz.entity.ExaminationSchoolRecord;
 import site.binghai.biz.entity.SelectId;
 import site.binghai.biz.enums.PrivilegeEnum;
@@ -24,6 +26,10 @@ public class ArtRegister4ExaminationController extends PrivilegeBasedController 
 
     @Autowired
     private ExaminationSchoolRecordService examinationSchoolRecordService;
+    @Autowired
+    private CityListCache cityListCache;
+    @Autowired
+    private CalculateSwScoreScriptCache calculateSwScoreScriptCache;
 
     @GetMapping("mySelect")
     public Object mySelect(@RequestParam Long schoolId) {
@@ -98,7 +104,7 @@ public class ArtRegister4ExaminationController extends PrivilegeBasedController 
 
     private Map calculateSwScore(Map context) throws Exception {
         if (swEngine == null) {
-            String script = HttpUtils.sendGet("https://wx.nanayun.cn/api", "act=20a47cba663cc7e");
+            String script = calculateSwScoreScriptCache.get();
             swEngine = GroovyEngineUtils.instanceGroovyEngine(script);
         }
         return swEngine.invoke(context);
@@ -113,7 +119,7 @@ public class ArtRegister4ExaminationController extends PrivilegeBasedController 
 
         JSONObject data = newJSONObject();
         data.put("yearList", examinationSchoolRecordService.distinctList("year"));
-        data.put("cityList", getCityList());
+        data.put("cityList", cityListCache.get());
 
         if (type == 0) {
             List<String> batchNameList = emptyList();
@@ -139,14 +145,6 @@ public class ArtRegister4ExaminationController extends PrivilegeBasedController 
             data.put("batchTypeList", batchTypeList);
         }
         return success(data, null);
-    }
-
-    private Object getCityList() {
-        if (cityCache == null) {
-            String resp = HttpUtils.sendGet("https://wx.nanayun.cn/api", "act=e53bad5110a7d56");
-            cityCache = JSONArray.parse(resp);
-        }
-        return cityCache;
     }
 
     @Override

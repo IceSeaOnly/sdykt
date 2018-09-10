@@ -142,19 +142,23 @@ public class ExcelUtils {
                     if (rowNum == firstRowNum) {
                         mapper = new String[lastCellNum - firstCellNum + 1];
                     }
-                    JSONObject item = new JSONObject();
-                    //循环当前列
-                    for (int cellNum = firstCellNum; cellNum < lastCellNum; cellNum++) {
-                        Cell cell = row.getCell(cellNum);
-                        String val = getCellValue(cell);
-                        if (rowNum == firstRowNum) {
-                            mapper[cellNum - firstCellNum] = val;
-                        } else {
-                            item.put(mapper[cellNum - firstCellNum], val);
+                    try {
+                        JSONObject item = new JSONObject();
+                        //循环当前列
+                        for (int cellNum = firstCellNum; cellNum < lastCellNum; cellNum++) {
+                            Cell cell = row.getCell(cellNum);
+                            String val = getCellValue(cell);
+                            if (rowNum == firstRowNum) {
+                                mapper[cellNum - firstCellNum] = val;
+                            } else {
+                                item.put(mapper[cellNum - firstCellNum], val);
+                            }
                         }
-                    }
-                    if (rowNum != firstRowNum) {
-                        list.add(item.toJavaObject(clazz));
+                        if (rowNum != firstRowNum) {
+                            list.add(item.toJavaObject(clazz));
+                        }
+                    } catch (Exception e) {
+                        System.out.println("read excel error at row " + rowNum + "," + e.getMessage());
                     }
                 }
             }
@@ -205,7 +209,7 @@ public class ExcelUtils {
 
     public static String getCellValue(Cell cell) {
         String cellValue = "";
-        if(cell == null) return null;
+        if (cell == null) return null;
         switch (cell.getCellType()) {
             case Cell.CELL_TYPE_NUMERIC: // 数字
                 if (org.apache.poi.ss.usermodel.DateUtil.isCellDateFormatted(cell)) {

@@ -12,13 +12,13 @@ import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-@Service("miaoDiSmsService")
-public class MiaoDiSmsService extends BaseBean implements SmsService {
+@Service("miaoDiSmsTestService")
+public class MiaoDiSmsTestService extends BaseBean implements SmsService {
     @Autowired
     private IceConfig iceConfig;
     private static final String RESP_DATA_TYPE = "json";
     private static String operation = "/industrySMS/sendSMS";
-    private static String smsContent = "【冰海科技】尊敬的用户，您的验证码为{%s}";
+    private static String smsContent = "【冰海科技】尊敬的用户，您的验证码为%s";
     public static final String BASE_URL = "https://api.miaodiyun.com/20150822";
 
     public String createCommonParam() {
