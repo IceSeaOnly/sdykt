@@ -33,21 +33,20 @@ public class ArtRegister4ExaminationController extends PrivilegeBasedController 
     private SwGroovyEngineCache swGroovyEngineCache;
 
     @GetMapping("mySelect")
-    public Object mySelect(@RequestParam Long schoolId,@RequestParam Integer position) {
+    public Object mySelect(@RequestParam Long schoolId, @RequestParam Integer position) {
         SelectId selectIds = getSessionPersistent(SelectId.class);
         if (selectIds == null) {
             return fail("会话超时!请重新登录!");
         }
 
         List<Long> newIds = emptyList();
-        position -= 1;
-        for (int i = 0; i < Math.max(selectIds.getIds().size(),position); i++) {
-            if(i == position){
+        for (int i = 0; i < Math.max(selectIds.getIds().size(), position); i++) {
+            if (i == position - 1) {
                 newIds.add(schoolId);
-            }else{
-                if(i < selectIds.getIds().size()){
+            } else {
+                if (i < selectIds.getIds().size()) {
                     newIds.add(selectIds.getIds().get(i));
-                }else{
+                } else {
                     newIds.add(-1l);
                 }
             }
@@ -58,7 +57,7 @@ public class ArtRegister4ExaminationController extends PrivilegeBasedController 
     }
 
     @GetMapping("resetMySelect")
-    public Object resetMySelect(){
+    public Object resetMySelect() {
         persistent(new SelectId());
         return success();
     }
@@ -72,11 +71,11 @@ public class ArtRegister4ExaminationController extends PrivilegeBasedController 
 
         List<ExaminationSchoolRecord> ls = emptyList();
 
-        if(isEmptyList(selectIds.getIds())){
+        if (isEmptyList(selectIds.getIds())) {
             return success(ls, null);
         }
 
-        if(action == 1){
+        if (action == 1) {
             for (int i = 0; i < selectIds.getIds().size(); i++) {
                 long id = selectIds.getIds().get(i);
                 ExaminationSchoolRecord record;
@@ -89,7 +88,7 @@ public class ArtRegister4ExaminationController extends PrivilegeBasedController 
                 record.setExtra(i + 1);
                 ls.add(record);
             }
-        }else{
+        } else {
             ls.addAll(examinationSchoolRecordService.findByIds(selectIds.getIds()));
         }
 
@@ -127,7 +126,7 @@ public class ArtRegister4ExaminationController extends PrivilegeBasedController 
                 .filter(v -> !hasEmptyString(v.getMinScore()))
                 .filter(v -> sw_score > v.getMinScore())
                 .sorted((a, b) -> b.getMinScore() > a.getMinScore() ? 1 : -1)
-                .limit(16)
+                .limit(12)
                 .collect(Collectors.toList());
 
         JSONObject ret = newJSONObject();
