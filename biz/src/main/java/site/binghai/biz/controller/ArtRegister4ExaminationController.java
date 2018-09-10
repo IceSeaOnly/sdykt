@@ -15,6 +15,7 @@ import site.binghai.lib.utils.GroovyEngineUtils;
 import site.binghai.lib.utils.HttpUtils;
 
 import javax.script.ScriptException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -32,30 +33,66 @@ public class ArtRegister4ExaminationController extends PrivilegeBasedController 
     private SwGroovyEngineCache swGroovyEngineCache;
 
     @GetMapping("mySelect")
-    public Object mySelect(@RequestParam Long schoolId) {
+    public Object mySelect(@RequestParam Long schoolId,@RequestParam Integer position) {
         SelectId selectIds = getSessionPersistent(SelectId.class);
         if (selectIds == null) {
             return fail("会话超时!请重新登录!");
         }
 
-        if (selectIds.getIds().contains(schoolId)) {
-            selectIds.getIds().remove(schoolId);
-        } else {
-            selectIds.getIds().add(schoolId);
+        List<Long> newIds = emptyList();
+        position -= 1;
+        for (int i = 0; i < Math.max(selectIds.getIds().size(),position); i++) {
+            if(i == position){
+                newIds.add(schoolId);
+            }else{
+                if(i < selectIds.getIds().size()){
+                    newIds.add(selectIds.getIds().get(i));
+                }else{
+                    newIds.add(-1l);
+                }
+            }
         }
-
+        selectIds.setIds(newIds);
         persistent(selectIds);
         return success();
     }
 
+    @GetMapping("resetMySelect")
+    public Object resetMySelect(){
+        persistent(new SelectId());
+        return success();
+    }
+
     @GetMapping("mySelectedList")
-    public Object mySelectedList() {
+    public Object mySelectedList(@RequestParam Integer action) {
         SelectId selectIds = getSessionPersistent(SelectId.class);
         if (selectIds == null) {
             return fail("会话超时!请重新登录!");
         }
 
-        List<ExaminationSchoolRecord> ls = examinationSchoolRecordService.findByIds(selectIds.getIds());
+        List<ExaminationSchoolRecord> ls = emptyList();
+
+        if(isEmptyList(selectIds.getIds())){
+            return success(ls, null);
+        }
+
+        if(action == 1){
+            for (int i = 0; i < selectIds.getIds().size(); i++) {
+                long id = selectIds.getIds().get(i);
+                ExaminationSchoolRecord record;
+                if (id == -1l) {
+                    record = new ExaminationSchoolRecord();
+                    record.setSchoolName("未选择志愿");
+                } else {
+                    record = examinationSchoolRecordService.findById(id);
+                }
+                record.setExtra(i + 1);
+                ls.add(record);
+            }
+        }else{
+            ls.addAll(examinationSchoolRecordService.findByIds(selectIds.getIds()));
+        }
+
         ls.sort((a, b) -> b.getMinScore() > a.getMinScore() ? 1 : -1);
         return success(ls, null);
     }

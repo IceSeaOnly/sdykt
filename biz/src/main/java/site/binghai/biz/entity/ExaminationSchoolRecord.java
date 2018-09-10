@@ -6,6 +6,7 @@ import site.binghai.lib.entity.BaseEntity;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.Transient;
 
 @Data
 @Entity
@@ -33,4 +34,7 @@ public class ExaminationSchoolRecord extends BaseEntity {
     private Double maxScore;
     // 最低分
     private Double minScore;
+
+    @Transient
+    private Object extra;
 }
