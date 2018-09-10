@@ -53,6 +53,7 @@ public class ArtRegister4ExaminationController extends PrivilegeBasedController 
         }
         selectIds.setIds(newIds);
         persistent(selectIds);
+        logger.info("selected id changed :{}", selectIds.getIds());
         return success();
     }
 
