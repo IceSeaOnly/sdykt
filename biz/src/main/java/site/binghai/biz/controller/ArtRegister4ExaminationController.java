@@ -93,7 +93,6 @@ public class ArtRegister4ExaminationController extends PrivilegeBasedController 
             ls.addAll(examinationSchoolRecordService.findByIds(selectIds.getIds()));
         }
 
-        ls.sort((a, b) -> b.getMinScore() > a.getMinScore() ? 1 : -1);
         return success(ls, null);
     }
 
