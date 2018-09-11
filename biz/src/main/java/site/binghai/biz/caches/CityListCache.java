@@ -2,7 +2,7 @@ package site.binghai.biz.caches;
 
 import com.alibaba.fastjson.JSONArray;
 import org.springframework.stereotype.Component;
-import site.binghai.biz.service.AbastractCacheService;
+import site.binghai.lib.service.AbastractCacheService;
 import site.binghai.lib.utils.HttpUtils;
 
 @Component

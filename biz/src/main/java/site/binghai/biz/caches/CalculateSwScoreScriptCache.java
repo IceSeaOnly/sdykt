@@ -1,7 +1,7 @@
 package site.binghai.biz.caches;
 
 import org.springframework.stereotype.Component;
-import site.binghai.biz.service.AbastractCacheService;
+import site.binghai.lib.service.AbastractCacheService;
 import site.binghai.lib.utils.HttpUtils;
 
 @Component

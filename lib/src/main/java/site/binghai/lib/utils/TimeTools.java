@@ -18,6 +18,7 @@ public class TimeTools {
     }
 
     public static String format(Long date) {
+        if(date == null) return null;
         try {
             SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             return df.format(date);

@@ -2,7 +2,7 @@ package site.binghai.biz.caches;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import site.binghai.biz.service.AbastractCacheService;
+import site.binghai.lib.service.AbastractCacheService;
 import site.binghai.lib.utils.GroovyEngineUtils;
 
 import javax.script.ScriptException;

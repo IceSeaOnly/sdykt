@@ -1,17 +1,16 @@
-package site.binghai.biz.service;
+package site.binghai.lib.service;
 
 import site.binghai.lib.def.CacheService;
 import site.binghai.lib.utils.BaseBean;
 import site.binghai.lib.utils.TimeTools;
 
-import java.util.Map;
-
-public abstract class AbastractKVCacheService<K, V, P extends Map<K, V>> extends BaseBean implements CacheService<P> {
+public abstract class AbastractCacheService<T> extends BaseBean implements CacheService<T> {
     private long expiredSecs = 0l;
     private long lastCallTime = 0l;
-    private P cache;
+    private T cache;
 
-    public V get(K key) {
+
+    public T get() {
         if (cache == null) {
             init();
         }
@@ -19,7 +18,7 @@ public abstract class AbastractKVCacheService<K, V, P extends Map<K, V>> extends
             loadData();
         }
 
-        return cache.get(key);
+        return cache;
     }
 
     private boolean expired() {
