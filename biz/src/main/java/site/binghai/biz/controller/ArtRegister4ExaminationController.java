@@ -36,7 +36,7 @@ public class ArtRegister4ExaminationController extends PrivilegeBasedController 
     public Object mySelect(@RequestParam Long schoolId, @RequestParam Integer position) {
         SelectId selectIds = getSessionPersistent(SelectId.class);
         if (selectIds == null) {
-            return selectIds = new SelectId();
+            selectIds = new SelectId();
         }
 
         List<Long> newIds = emptyList();
