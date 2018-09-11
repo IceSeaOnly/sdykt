@@ -102,7 +102,7 @@ public class ArtRegister4ExaminationController extends PrivilegeBasedController 
             return permissionDeny();
         }
         Map result = calculateSwScore(map);
-        Integer score = getInteger(result, "sw");
+        Double score = getDouble(result, "sw");
         return success(score, null);
     }
 

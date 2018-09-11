@@ -13,7 +13,7 @@ import java.util.List;
 public class TokenSeedService extends BaseService<TokenSeed> {
 
     @Transactional
-    public synchronized List<Long> apply(long size) {
+    public synchronized List<String> apply(long size) {
         List<TokenSeed> tokenSeeds = findAll(1);
         TokenSeed tokenSeed = null;
         if (CollectionUtils.isEmpty(tokenSeeds)) {
@@ -22,9 +22,10 @@ public class TokenSeedService extends BaseService<TokenSeed> {
 
         tokenSeed = tokenSeeds.get(0);
 
-        List<Long> res = new ArrayList<>();
+        List<String> res = new ArrayList<>();
         for (long i = 0; i < size; i++) {
-            res.add(tokenSeed.getCurrent() + i);
+            long cur = tokenSeed.getCurrent() + i;
+            res.add("A"+cur);
         }
         tokenSeed.setCurrent(tokenSeed.getCurrent() + size);
         save(tokenSeed);

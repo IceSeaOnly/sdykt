@@ -117,15 +117,15 @@ public class TokenManageController extends BaseController {
             return fail("PRIVILEGES NOT EXIST");
         }
 
-        List<Long> numberList = tokenSeedService.apply(size);
+        List<String> numberList = tokenSeedService.apply(size);
         List<Token> tokens = new ArrayList<>();
 
-        for (Long n : numberList) {
+        for (String n : numberList) {
             Token token = new Token();
             token.setPrivileges(privileges);
             token.setActiveTime(null);
             token.setTokenName(tokenName);
-            token.setToken(n.toString());
+            token.setToken(n);
             token.setSecret(TokenGenerator.generate(5));
 
             tokens.add(token);
