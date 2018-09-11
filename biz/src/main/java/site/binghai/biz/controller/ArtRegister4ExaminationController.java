@@ -36,7 +36,7 @@ public class ArtRegister4ExaminationController extends PrivilegeBasedController 
     public Object mySelect(@RequestParam Long schoolId, @RequestParam Integer position) {
         SelectId selectIds = getSessionPersistent(SelectId.class);
         if (selectIds == null) {
-            return fail("会话超时!请重新登录!");
+            return selectIds = new SelectId();
         }
 
         List<Long> newIds = emptyList();
@@ -67,7 +67,7 @@ public class ArtRegister4ExaminationController extends PrivilegeBasedController 
     public Object mySelectedList(@RequestParam Integer action) {
         SelectId selectIds = getSessionPersistent(SelectId.class);
         if (selectIds == null) {
-            return fail("会话超时!请重新登录!");
+            selectIds = new SelectId();
         }
 
         List<ExaminationSchoolRecord> ls = emptyList();
@@ -108,13 +108,17 @@ public class ArtRegister4ExaminationController extends PrivilegeBasedController 
 
     @PostMapping("consult")
     public Object consult(@RequestBody Map map) {
-        persistent(new SelectId());
         String batchName = getString(map, "batchName");
         String batchType = getString(map, "batchType");
         String score = getString(map, "score");
         String year = getString(map, "year");
         String city = getString(map, "city");
         Integer sw_score = getInteger(map, "sw_score");
+        Integer art_user_input = getInteger(map, "art_user_input");
+        // 以三维标准分计算，如果用户自行输入了三维标准分，就按用户输入的查找
+        if (art_user_input != null) {
+            sw_score = art_user_input;
+        }
 
         if (hasEmptyString(batchName, batchType, score, year)) {
             return fail("年份、批次、科类、分数都是必填的哦~");
@@ -123,9 +127,10 @@ public class ArtRegister4ExaminationController extends PrivilegeBasedController 
         List<ExaminationSchoolRecord> recordList =
                 examinationSchoolRecordService.findByBatchNameAndBatchTypeAndYear(batchName, batchType, year);
 
+        final Integer facotr = sw_score;
         List rs = recordList.stream()
                 .filter(v -> !hasEmptyString(v.getMinScore()))
-                .filter(v -> sw_score > v.getMinScore())
+                .filter(v -> facotr > v.getMinScore())
                 .sorted((a, b) -> b.getMinScore() > a.getMinScore() ? 1 : -1)
                 .limit(12)
                 .collect(Collectors.toList());
@@ -134,7 +139,13 @@ public class ArtRegister4ExaminationController extends PrivilegeBasedController 
 
         ret.put("list", rs);
         ret.put("total", rs.size());
-        return success(ret, null);
+
+        String msg = null;
+        if (isEmptyList(rs)) {
+            return success(ret, "没有符合条件的院校哦，建议调整一下搜索条件!");
+        }
+        msg = String.format("已为您优选 %d 个院校%s", rs.size(), art_user_input == null ? ",由于您没有输入三维标准分本次搜索以综合分查找" : "");
+        return success(ret, msg);
     }
 
 
