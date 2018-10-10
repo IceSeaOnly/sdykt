@@ -98,12 +98,13 @@ public class ArtRegister4ExaminationController extends PrivilegeBasedController 
 
     @PostMapping("consultSwScore")
     public Object consultSwScore(@RequestBody Map map) throws Exception {
+        long ts = System.currentTimeMillis();
         if (!hasPrivilege()) {
             return permissionDeny();
         }
         Map result = calculateSwScore(map);
         Double score = getDouble(result, "sw");
-        return success(score, null);
+        return success(score, String.valueOf(ts));
     }
 
     @PostMapping("consult")
