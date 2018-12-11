@@ -9,8 +9,10 @@ import site.binghai.biz.caches.CityListCache;
 import site.binghai.biz.caches.SwGroovyEngineCache;
 import site.binghai.biz.entity.ExaminationSchoolRecord;
 import site.binghai.biz.entity.SelectId;
+import site.binghai.biz.entity.Token;
 import site.binghai.biz.enums.PrivilegeEnum;
 import site.binghai.biz.service.ExaminationSchoolRecordService;
+import site.binghai.biz.service.TokenService;
 import site.binghai.lib.utils.GroovyEngineUtils;
 import site.binghai.lib.utils.HttpUtils;
 
@@ -31,7 +33,12 @@ public class ArtRegister4ExaminationController extends PrivilegeBasedController 
     private CityListCache cityListCache;
     @Autowired
     private SwGroovyEngineCache swGroovyEngineCache;
+    @Autowired
+    private TokenService tokenService;
 
+    /**
+     * 用户前台选择后，后台同步更新数据
+     */
     @GetMapping("mySelect")
     public Object mySelect(@RequestParam Long schoolId, @RequestParam Integer position) {
         SelectId selectIds = getSessionPersistent(SelectId.class);
@@ -45,14 +52,17 @@ public class ArtRegister4ExaminationController extends PrivilegeBasedController 
                 newIds.add(schoolId);
             } else {
                 if (i < selectIds.getIds().size()) {
-                    newIds.add(selectIds.getIds().get(i));
+                    //如果之前已经选过这个学校，则清除之前的选择
+                    Long cur = selectIds.getIds().get(i);
+                    newIds.add(cur.equals(schoolId) ? -1L : cur);
                 } else {
-                    newIds.add(-1l);
+                    newIds.add(-1L);
                 }
             }
         }
         selectIds.setIds(newIds);
         persistent(selectIds);
+        examinationSchoolRecordService.hot(schoolId);
         logger.info("selected id changed :{}", selectIds.getIds());
         return success();
     }
@@ -80,7 +90,7 @@ public class ArtRegister4ExaminationController extends PrivilegeBasedController 
             for (int i = 0; i < selectIds.getIds().size(); i++) {
                 long id = selectIds.getIds().get(i);
                 ExaminationSchoolRecord record;
-                if (id == -1l) {
+                if (id == -1L) {
                     record = new ExaminationSchoolRecord();
                     record.setSchoolName("未选择志愿");
                 } else {
@@ -109,6 +119,16 @@ public class ArtRegister4ExaminationController extends PrivilegeBasedController 
 
     @PostMapping("consult")
     public Object consult(@RequestBody Map map) {
+        if (!hasPrivilege()) {
+            return permissionDeny();
+        }
+
+        Token token = getSessionPersistent(Token.class);
+        token = tokenService.findById(token.getId());
+        if (token.getZybkCount() <= 0) {
+            return fail("您的志愿模拟次数已经用完，无法使用本功能！");
+        }
+
         String batchName = getString(map, "batchName");
         String batchType = getString(map, "batchType");
         String score = getString(map, "score");
@@ -126,15 +146,15 @@ public class ArtRegister4ExaminationController extends PrivilegeBasedController 
         }
 
         List<ExaminationSchoolRecord> recordList =
-                examinationSchoolRecordService.findByBatchNameAndBatchTypeAndYear(batchName, batchType, year);
+            examinationSchoolRecordService.findByBatchNameAndBatchTypeAndYear(batchName, batchType, year);
 
         final Integer facotr = sw_score;
         List rs = recordList.stream()
-                .filter(v -> !hasEmptyString(v.getMinScore()))
-                .filter(v -> facotr > v.getMinScore())
-                .sorted((a, b) -> b.getMinScore() > a.getMinScore() ? 1 : -1)
-                .limit(12)
-                .collect(Collectors.toList());
+            .filter(v -> !hasEmptyString(v.getMinScore()))
+            .filter(v -> facotr > v.getMinScore())
+            .sorted((a, b) -> b.getMinScore() > a.getMinScore() ? 1 : -1)
+            .limit(16)
+            .collect(Collectors.toList());
 
         JSONObject ret = newJSONObject();
 
@@ -146,14 +166,18 @@ public class ArtRegister4ExaminationController extends PrivilegeBasedController 
             return success(ret, "没有符合条件的院校哦，建议调整一下搜索条件!");
         }
         msg = String.format("已为您优选 %d 个院校%s", rs.size(), art_user_input == null ? ",由于您没有输入三维标准分本次搜索以综合分查找" : "");
+
+        token.setZybkCount(token.getZybkCount() - 1);
+        tokenService.update(token);
+        if (token.getZybkCount() <= 5) {
+            msg += "；您的模拟选择次数还剩" + token.getZybkCount() + "次";
+        }
         return success(ret, msg);
     }
-
 
     private Map calculateSwScore(Map context) throws Exception {
         return swGroovyEngineCache.get().invoke(context);
     }
-
 
     @GetMapping("options")
     public Object options(@RequestParam Integer type) {

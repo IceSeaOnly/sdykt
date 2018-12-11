@@ -22,7 +22,7 @@ public class UserController extends BaseController {
     private SmsTokenService miaoDiSmsService;
 
     @RequestMapping("logout")
-    public Object logout(){
+    public Object logout() {
         getSession().invalidate();
         return success();
     }
@@ -36,11 +36,14 @@ public class UserController extends BaseController {
             fail("输入不正确!");
         }
 
-        Token token = tokenService.findByTokenAndSecret(TOKEN_NO,TOKEN_SECRET);
+        Token token = tokenService.findByTokenAndSecret(TOKEN_NO, TOKEN_SECRET);
         if (token == null) {
             return fail("卡号/密码错误!");
         }
 
+        if(Boolean.TRUE.equals(token.getForbidden())){
+            return fail("账号被禁止登录");
+        }
 
         WxUser user = wxUserService.findByTokenNo(TOKEN_NO);
         if (user == null) {
@@ -105,8 +108,8 @@ public class UserController extends BaseController {
 
     private boolean checkRequest() {
         String req = getStringFromSession("REG_REQUEST");
-        if (req == null) return true;
-        if (now() - Long.valueOf(req) < 6000) return false;
+        if (req == null) { return true; }
+        if (now() - Long.valueOf(req) < 6000) { return false; }
         return true;
     }
 }

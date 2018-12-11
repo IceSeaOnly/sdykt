@@ -60,22 +60,22 @@ public class TokenManageController extends BaseController {
     @GetMapping("download")
     public void download(@RequestParam String ids, HttpServletResponse response) throws IOException {
         List<Long> idList = Arrays.stream(ids.split(","))
-                .map(Long::valueOf)
-                .collect(Collectors.toList());
+            .map(Long::valueOf)
+            .collect(Collectors.toList());
 
         List<Token> tokens = tokenService.findByIds(idList);
 
         ExcelUtils.builder()
-                .mapper("id", "卡序列号")
-                .mapper("tokenName", "发卡批次号")
-                .mapper("token", "卡号")
-                .mapper("secret", "卡密")
-                .mapper("privilegeProjectNames", "平台权限")
-                .mapper("bindUserId", "绑定ID(如果已激活)")
-                .mapper("createdTime", "发卡时间")
-                .mapper("activeTimeStr", "激活时间(如果已激活)")
-                .putAll(toJSONArray(tokens))
-                .webBuild(response, null);
+            .mapper("id", "卡序列号")
+            .mapper("tokenName", "发卡批次号")
+            .mapper("token", "卡号")
+            .mapper("secret", "卡密")
+            .mapper("privilegeProjectNames", "平台权限")
+            .mapper("bindUserId", "绑定ID(如果已激活)")
+            .mapper("createdTime", "发卡时间")
+            .mapper("activeTimeStr", "激活时间(如果已激活)")
+            .putAll(toJSONArray(tokens))
+            .webBuild(response, null);
     }
 
     @GetMapping("delete")
@@ -84,16 +84,27 @@ public class TokenManageController extends BaseController {
         Manager manager = getSessionPersistent(Manager.class);
 
         List<Long> idList = Arrays.stream(ids.split(","))
-                .map(Long::valueOf)
-                .collect(Collectors.toList());
+            .map(Long::valueOf)
+            .collect(Collectors.toList());
 
         tokenService.findByIds(idList)
-                .stream()
-                .peek(v -> logger.warn("{} deleted Token {}", manager, v))
-                .forEach(v -> tokenService.delete(v.getId()));
+            .stream()
+            .peek(v -> logger.warn("{} deleted Token {}", manager, v))
+            .forEach(v -> tokenService.delete(v.getId()));
 
         String message = String.format("%d 张删除成功!", idList.size());
         return success(message, message);
+    }
+
+    @GetMapping("forbidden")
+    public Object forbidden(@RequestParam Long tokenId) {
+        Manager manager = getSessionPersistent(Manager.class);
+        Token token = tokenService.findById(tokenId);
+        logger.warn("{} forbidden token {}", manager, token);
+        token.setForbidden(Boolean.TRUE);
+        tokenService.update(token);
+
+        return success();
     }
 
     @PostMapping("create")
@@ -102,16 +113,14 @@ public class TokenManageController extends BaseController {
         String tokenName = getString(map, "TOKEN_NAME");
         int size = getIntValue(map, "TOKEN_SIZE");
 
-
         if (hasEmptyString(privileges)) {
             return fail("PRIVILEGES NOT EXIST");
         }
 
         privileges = Arrays.asList(privileges.split(","))
-                .stream()
-                .filter(v -> PrivilegeEnum.valueOfName(v) != null)
-                .collect(Collectors.joining(","));
-
+            .stream()
+            .filter(v -> PrivilegeEnum.valueOfName(v) != null)
+            .collect(Collectors.joining(","));
 
         if (hasEmptyString(privileges)) {
             return fail("PRIVILEGES NOT EXIST");

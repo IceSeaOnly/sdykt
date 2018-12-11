@@ -30,13 +30,18 @@ public class Token extends BaseEntity implements SessionPersistent {
     private String activeTimeStr;
     //ONE,TWO,THREE,etc...
     private String privileges;
+    // 志愿报考特权
+    private Integer zybkCount;
+
+    private Boolean forbidden;
+
+
     @Transient
     private List<String> privilegeList;
 
-
     public void setPrivileges(String privileges) {
         this.privileges = privileges;
-        if (StringUtils.isBlank(privileges)) return;
+        if (StringUtils.isBlank(privileges)) { return; }
         privilegeList = Arrays.asList(privileges.split(","));
     }
 

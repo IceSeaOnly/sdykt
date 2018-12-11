@@ -37,4 +37,10 @@ public class ExaminationSchoolRecord extends BaseEntity {
 
     @Transient
     private Object extra;
+
+    // 热度
+    private Integer hot;
+
+    private String officialWebsite;
+
 }
