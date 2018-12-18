@@ -14,6 +14,7 @@ import site.binghai.biz.enums.PrivilegeEnum;
 import site.binghai.biz.service.ExaminationSchoolRecordService;
 import site.binghai.biz.service.TokenService;
 import site.binghai.lib.utils.GroovyEngineUtils;
+
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -106,7 +107,7 @@ public class ArtRegister4ExaminationController extends PrivilegeBasedController 
                 }
                 ls.add(record);
             });
-            for (int i = 0; i < ls.size() - 12; i++) {
+            for (int i = 0; i < 12 - ls.size(); i++) {
                 ExaminationSchoolRecord record = new ExaminationSchoolRecord();
                 record.setId(-1L);
                 ls.add(record);
@@ -163,7 +164,7 @@ public class ArtRegister4ExaminationController extends PrivilegeBasedController 
             .filter(v -> !hasEmptyString(v.getMinScore()))
             .filter(v -> facotr > v.getMinScore())
             .sorted((a, b) -> b.getMinScore() > a.getMinScore() ? 1 : -1)
-            .limit(12)
+            .limit(16)
             .collect(Collectors.toList());
 
         JSONObject ret = newJSONObject();
