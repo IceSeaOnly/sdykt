@@ -107,7 +107,7 @@ public class ArtRegister4ExaminationController extends PrivilegeBasedController 
                 }
                 ls.add(record);
             });
-            for (int i = 0; i <= 12 - ls.size(); i++) {
+            while (ls.size() < 12) {
                 ExaminationSchoolRecord record = new ExaminationSchoolRecord();
                 record.setId(-1L);
                 ls.add(record);
