@@ -1,16 +1,16 @@
 package site.binghai.biz.controller;
 
-import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import site.binghai.biz.caches.CalculateSwScoreScriptCache;
 import site.binghai.biz.caches.CityListCache;
 import site.binghai.biz.caches.SwGroovyEngineCache;
 import site.binghai.biz.entity.ExaminationSchoolRecord;
 import site.binghai.biz.entity.SelectId;
 import site.binghai.biz.entity.Token;
+import site.binghai.biz.enums.AnalysisTag;
 import site.binghai.biz.enums.PrivilegeEnum;
+import site.binghai.biz.service.AnalysisLogService;
 import site.binghai.biz.service.ExaminationSchoolRecordService;
 import site.binghai.biz.service.TokenService;
 import site.binghai.lib.utils.GroovyEngineUtils;
@@ -32,12 +32,15 @@ public class ArtRegister4ExaminationController extends PrivilegeBasedController 
     private SwGroovyEngineCache swGroovyEngineCache;
     @Autowired
     private TokenService tokenService;
+    @Autowired
+    private AnalysisLogService logService;
 
     /**
      * 用户前台选择后，后台同步更新数据
      */
     @GetMapping("mySelect")
     public Object mySelect(@RequestParam Long schoolId, @RequestParam Integer position) {
+        Token token = getSessionPersistent(Token.class);
         SelectId selectIds = getSessionPersistent(SelectId.class);
         if (selectIds == null) {
             selectIds = new SelectId();
@@ -60,6 +63,11 @@ public class ArtRegister4ExaminationController extends PrivilegeBasedController 
         selectIds.setIds(newIds);
         persistent(selectIds);
         examinationSchoolRecordService.hot(schoolId);
+
+        logService.log(AnalysisTag.SELECT)
+            .and("tokenId",token.getId())
+            .done();
+
         logger.info("selected id changed :{}", selectIds.getIds());
         return success();
     }
@@ -114,6 +122,11 @@ public class ArtRegister4ExaminationController extends PrivilegeBasedController 
             }
         }
 
+        logService.log(AnalysisTag.SELECTED)
+            .and("list",ls)
+            .and("action",action)
+            .done();
+
         return success(ls, null);
     }
 
@@ -125,6 +138,12 @@ public class ArtRegister4ExaminationController extends PrivilegeBasedController 
         }
         Map result = calculateSwScore(map);
         Double score = getDouble(result, "sw");
+
+        logService.log(AnalysisTag.CONSULT_SW_SCORE)
+            .and("input",map)
+            .and("ret",score)
+            .and("ts",ts)
+            .done();
         return success(score, String.valueOf(ts));
     }
 
@@ -183,6 +202,11 @@ public class ArtRegister4ExaminationController extends PrivilegeBasedController 
         if (token.getZybkCount() <= 5) {
             msg += "；您的模拟选择次数还剩" + token.getZybkCount() + "次";
         }
+
+        logService.log(AnalysisTag.CONSULT)
+            .and("input",map)
+            .and("ret",rs)
+            .done();
         return success(ret, msg);
     }
 
