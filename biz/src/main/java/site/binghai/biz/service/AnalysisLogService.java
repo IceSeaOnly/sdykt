@@ -2,7 +2,6 @@ package site.binghai.biz.service;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.stereotype.Service;
 import site.binghai.biz.entity.AnalysisLog;
 import site.binghai.biz.enums.AnalysisTag;
@@ -15,9 +14,7 @@ import javax.transaction.Transactional;
  * @date 2019/1/3 下午3:00
  **/
 @Service
-public class AnalysisLogService extends BaseService<AnalysisLog> implements InitializingBean {
-
-    private static AnalysisLogService holder;
+public class AnalysisLogService extends BaseService<AnalysisLog> {
 
     @Transactional
     public void log(AnalysisTag tag, Object obj) {
@@ -27,22 +24,20 @@ public class AnalysisLogService extends BaseService<AnalysisLog> implements Init
         save(log);
     }
 
+    @Transactional
     public Builder log(AnalysisTag tag) {
-        return new Builder(tag);
-    }
-
-    @Override
-    public void afterPropertiesSet() throws Exception {
-        holder = this;
+        return new Builder(tag, this);
     }
 
     public class Builder {
         private AnalysisTag tag;
         private JSONObject obj;
+        private AnalysisLogService logService;
 
-        public Builder(AnalysisTag tag) {
+        public Builder(AnalysisTag tag, AnalysisLogService analysisLogService) {
             this.tag = tag;
             this.obj = new JSONObject();
+            this.logService = analysisLogService;
         }
 
         public Builder and(String key, Object value) {
@@ -51,7 +46,11 @@ public class AnalysisLogService extends BaseService<AnalysisLog> implements Init
         }
 
         public void done() {
-            holder.log(tag, obj);
+            try {
+                logService.log(tag, obj);
+            } catch (Exception e) {
+                logger.error("save AnalysisLog error!",e);
+            }
         }
     }
 }
