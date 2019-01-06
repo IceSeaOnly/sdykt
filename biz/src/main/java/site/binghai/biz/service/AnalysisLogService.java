@@ -23,34 +23,4 @@ public class AnalysisLogService extends BaseService<AnalysisLog> {
         log.setContent(JSON.toJSONString(obj));
         save(log);
     }
-
-    @Transactional
-    public Builder log(AnalysisTag tag) {
-        return new Builder(tag, this);
-    }
-
-    public class Builder {
-        private AnalysisTag tag;
-        private JSONObject obj;
-        private AnalysisLogService logService;
-
-        public Builder(AnalysisTag tag, AnalysisLogService analysisLogService) {
-            this.tag = tag;
-            this.obj = new JSONObject();
-            this.logService = analysisLogService;
-        }
-
-        public Builder and(String key, Object value) {
-            obj.put(key, value);
-            return this;
-        }
-
-        public void done() {
-            try {
-                logService.log(tag, obj);
-            } catch (Exception e) {
-                logger.error("save AnalysisLog error!",e);
-            }
-        }
-    }
 }

@@ -41,6 +41,9 @@ public class ExaminationSchoolRecord extends BaseEntity {
     // 热度
     private Integer hot;
 
+    // 特殊标记
+    private String markTag;
+
     private String officialWebsite;
 
 }

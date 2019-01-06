@@ -64,9 +64,9 @@ public class ArtRegister4ExaminationController extends PrivilegeBasedController 
         persistent(selectIds);
         examinationSchoolRecordService.hot(schoolId);
 
-        logService.log(AnalysisTag.SELECT)
-            .and("tokenId",token.getId())
-            .done();
+        JSONObject log = new JSONObject();
+        log.put("tokenId", token.getId());
+        logService.log(AnalysisTag.SELECT, log);
 
         logger.info("selected id changed :{}", selectIds.getIds());
         return success();
@@ -122,10 +122,10 @@ public class ArtRegister4ExaminationController extends PrivilegeBasedController 
             }
         }
 
-        logService.log(AnalysisTag.SELECTED)
-            .and("list",ls)
-            .and("action",action)
-            .done();
+        JSONObject log = new JSONObject();
+        log.put("list", ls);
+        log.put("action", action);
+        logService.log(AnalysisTag.SELECTED, log);
 
         return success(ls, null);
     }
@@ -139,11 +139,12 @@ public class ArtRegister4ExaminationController extends PrivilegeBasedController 
         Map result = calculateSwScore(map);
         Double score = getDouble(result, "sw");
 
-        logService.log(AnalysisTag.CONSULT_SW_SCORE)
-            .and("input",map)
-            .and("ret",score)
-            .and("ts",ts)
-            .done();
+        JSONObject log = new JSONObject();
+        log.put("input", map);
+        log.put("ret", score);
+        log.put("ts", ts);
+        logService.log(AnalysisTag.CONSULT_SW_SCORE, log);
+
         return success(score, String.valueOf(ts));
     }
 
@@ -203,10 +204,11 @@ public class ArtRegister4ExaminationController extends PrivilegeBasedController 
             msg += "；您的模拟选择次数还剩" + token.getZybkCount() + "次";
         }
 
-        logService.log(AnalysisTag.CONSULT)
-            .and("input",map)
-            .and("ret",rs)
-            .done();
+        JSONObject log = new JSONObject();
+        log.put("input", map);
+        log.put("ret", rs);
+        logService.log(AnalysisTag.CONSULT, log);
+
         return success(ret, msg);
     }
 
