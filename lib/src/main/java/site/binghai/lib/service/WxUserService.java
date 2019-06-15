@@ -31,6 +31,7 @@ public class WxUserService extends BaseService<WxUser> {
 
     public List<WxUser> findAllWithoutHiden(Integer page, int pageSize) {
         WxUser example = new WxUser();
+        example.setHiden(Boolean.FALSE);
         example.setCreated(null);
         example.setCreatedTime(null);
         Example<WxUser> ex = Example.of(example);
