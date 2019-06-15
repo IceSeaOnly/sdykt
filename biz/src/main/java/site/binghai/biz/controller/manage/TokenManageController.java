@@ -50,7 +50,7 @@ public class TokenManageController extends BaseController {
     public Object list(@RequestParam Integer page) {
         JSONObject obj = new JSONObject();
         page = page < 0 ? 0 : page;
-        List<Token> tokens = tokenService.findAll(page, 100);
+        List<Token> tokens = tokenService.findAllWithoutHiden(page, 100);
         obj.put("list", tokens);
         obj.put("total", tokenService.count());
         obj.put("page", page);
@@ -135,6 +135,7 @@ public class TokenManageController extends BaseController {
             token.setActiveTime(null);
             token.setTokenName(tokenName);
             token.setToken(n);
+            token.setHiden(Boolean.FALSE);
             token.setSecret(TokenGenerator.generate(5));
 
             tokens.add(token);

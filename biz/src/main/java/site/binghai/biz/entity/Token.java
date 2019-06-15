@@ -33,6 +33,7 @@ public class Token extends BaseEntity implements SessionPersistent {
     // 志愿报考特权
     private Integer zybkCount;
 
+    private Boolean hiden;
     private Boolean forbidden;
 
 
