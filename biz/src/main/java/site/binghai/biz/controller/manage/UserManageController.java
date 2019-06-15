@@ -21,7 +21,7 @@ public class UserManageController extends BaseController {
 
     @GetMapping("list")
     public Object list(@RequestParam Integer page) {
-        List<WxUser> userList = wxUserService.findAll(page, 100);
+        List<WxUser> userList = wxUserService.findAllWithoutHiden(page, 100);
         JSONObject data = newJSONObject();
         data.put("list", userList);
         data.put("total", wxUserService.count());

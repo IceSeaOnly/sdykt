@@ -56,6 +56,7 @@ public class UserController extends BaseController {
             user.setBindTokenId(token.getId());
             user.setEmail("还没有电邮~");
             user.setMyDeclaration("这个人很懒，什么都还没有写~");
+            user.setHiden(token.getHiden());
             user = wxUserService.save(user);
 
             token.setBindUserId(user.getId());
